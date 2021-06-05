@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CCameraController : MonoBehaviour
 {
-    private Transform m_transform;
     private Transform m_targetView;
     private bool isFirstView;
     [SerializeField]
@@ -21,12 +20,11 @@ public class CCameraController : MonoBehaviour
     // Start
     void Start()
     {
-        m_transform = GetComponent<Transform>();
         m_move = new CMove();
         m_look = new CMove();
         m_move.SetActionSpeed(1.5f);
         isFirstView = true;
-        m_targetView = obj1.GetComponent<Transform>();
+        m_targetView = obj1.transform;
         cameraPos = new Vector3(0, 2, -10);
     }
 
@@ -34,24 +32,21 @@ public class CCameraController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            Vector3 v;
-            v = m_targetView.position;
+            Vector3 previousPosition = m_targetView.position;
             isFirstView = !isFirstView;
-            if (isFirstView) m_targetView = obj1.GetComponent<Transform>();
-            else m_targetView = obj2.GetComponent<Transform>();
-            m_look.SetPositions(v, m_targetView.position);
+            if (isFirstView) m_targetView = obj1.transform;
+            else m_targetView = obj2.transform;
+            m_look.SetPositions(previousPosition, m_targetView.position);
             m_look.StartAction();
         }
     }
 
-    private void CheckDistance()
+    private void ControlDistance()
     {
-     float d;
-
-        d = Vector3.Distance(m_transform.position, m_targetView.position);
+        float d = Vector3.Distance(transform.position, m_targetView.position);
         if (d > maxDistance || d < minDistance)
         {
-            m_move.SetPositions(m_transform.position, m_targetView.position + cameraPos);
+            m_move.SetPositions(transform.position, m_targetView.position + cameraPos);
             m_move.StartAction();
         }
     }
@@ -63,16 +58,16 @@ public class CCameraController : MonoBehaviour
         if (m_move.IsActive())
         {
             m_move.UpdatePosition();
-            //testVec = m_move.GetCurrentPosition();
-            m_transform.position = m_move.GetCurrentPosition();
+            transform.position = m_move.GetCurrentPosition();
         }
-        else CheckDistance();
+        else ControlDistance();
 
         if(m_look.IsActive())
         {
+            m_look.CorrectTargetPosition(m_targetView.position);
             m_look.UpdatePosition();
-            m_transform.LookAt(m_look.GetCurrentPosition());
+            transform.LookAt(m_look.GetCurrentPosition());
         }
-        else m_transform.LookAt(m_targetView.position);
+        else transform.LookAt(m_targetView.position);
     }
 }

@@ -100,4 +100,9 @@ public class CMove
      return IsActive();
     }
 
+    public void CorrectTargetPosition(Vector3 _target)
+    {
+        targetPosition = _target;
+    }
+
 }
