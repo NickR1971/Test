@@ -15,15 +15,15 @@ public class CMove
     private Vector3 targetPosition;
     private Vector3 startPosition;
     private Vector3 currentPosition;
-    private float actSpeed;
-    private CTimer m_timer;
+    private float actionSpeed;
+    private CTimer actionTimer;
 
     //---------------------------------------------------------------------------
     // конструктор встановлює час дії на 1 секунду за замовчуванням 
     public CMove()
     {
-        actSpeed = 0;
-        m_timer = new CTimer();
+        actionSpeed = 0;
+        actionTimer = new CTimer();
         startPosition = new Vector3(0, 0, 0);
         targetPosition = startPosition;
     }
@@ -34,9 +34,9 @@ public class CMove
     // швидкість нуль або менше ігнорується
     private void CalcActionTime()
     {
-        if (actSpeed > 0)
+        if (actionSpeed > 0)
         {
-            m_timer.SetActionTime(Vector3.Distance(startPosition, targetPosition) / actSpeed);
+            actionTimer.SetActionTime(Vector3.Distance(startPosition, targetPosition) / actionSpeed);
         }
     }
 
@@ -54,7 +54,7 @@ public class CMove
     // SetActionTime
     public void SetActionTime(float _actionTime)
     {
-        m_timer.SetActionTime(_actionTime);
+        actionTimer.SetActionTime(_actionTime);
     }
 
     //---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public class CMove
     // істановлюємо час дії згідно заданої швидкості
     public void SetActionSpeed(float _actionSpeed)
     {
-        actSpeed = _actionSpeed;
+        actionSpeed = _actionSpeed;
         CalcActionTime();
     }
 
@@ -70,14 +70,14 @@ public class CMove
     // StartAction
     public void StartAction()
     {
-        m_timer.StartAction();
+        actionTimer.StartAction();
         currentPosition = startPosition;
     }
 
     //---------------------------------------------------------------------------
     // isActive
     // перевірка чи активна дія на цей час
-    public bool IsActive() { return m_timer.IsActive(); }
+    public bool IsActive() { return actionTimer.IsActive(); }
 
     //---------------------------------------------------------------------------
     // GetCurrentPosition
@@ -89,17 +89,20 @@ public class CMove
 
     //---------------------------------------------------------------------------
     // UpdatePosition
-    // розраховуємо поточну позицію та повертає false коли рух завершено
+    // розраховує поточну позицію та повертає false коли рух завершено
     public bool UpdatePosition()
     {
-        if (m_timer.UpdateState())
-            currentPosition = Vector3.Lerp(startPosition, targetPosition, m_timer.GetState());
+        if (actionTimer.UpdateState())
+            currentPosition = Vector3.Lerp(startPosition, targetPosition, actionTimer.GetState());
         else
             currentPosition = targetPosition;
 
      return IsActive();
     }
 
+    //---------------------------------------------------------------------------
+    // CorrectTargetPosition
+    // Корекція координат призначення використовується якщо ціль рухається
     public void CorrectTargetPosition(Vector3 _target)
     {
         targetPosition = _target;

@@ -12,7 +12,7 @@ public class CCameraController : MonoBehaviour
     private GameObject obj2;
     private CMove move;
     private CMove look;
-    private Vector3 cameraPos;
+    private Vector3 cameraOffset;
     private const int maxDistance = 15;
     private const int minDistance = 5;
 
@@ -25,19 +25,25 @@ public class CCameraController : MonoBehaviour
         move.SetActionSpeed(1.5f);
         isFirstView = true;
         targetView = obj1.transform;
-        cameraPos = new Vector3(0, 2, -10);
+        cameraOffset = new Vector3(0, 2, -10);
+    }
+
+    public void ChangeTagetView(Transform _target)
+    {
+        Vector3 previousPosition = targetView.position;
+        targetView = _target;
+        look.SetPositions(previousPosition, targetView.position);
+        look.StartAction();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            Vector3 previousPosition = targetView.position;
             isFirstView = !isFirstView;
-            if (isFirstView) targetView = obj1.transform;
-            else targetView = obj2.transform;
-            look.SetPositions(previousPosition, targetView.position);
-            look.StartAction();
+            //if (isFirstView) targetView = obj1.transform;
+            //else targetView = obj2.transform;
+            ChangeTagetView((isFirstView) ? obj1.transform : obj2.transform);
         }
     }
 
@@ -46,7 +52,7 @@ public class CCameraController : MonoBehaviour
         float d = Vector3.Distance(transform.position, targetView.position);
         if (d > maxDistance || d < minDistance)
         {
-            move.SetPositions(transform.position, targetView.position + cameraPos);
+            move.SetPositions(transform.position, targetView.position + cameraOffset);
             move.StartAction();
         }
     }
@@ -62,7 +68,7 @@ public class CCameraController : MonoBehaviour
         }
         else ControlDistance();
 
-       // transform.position = Vector3.Lerp(transform.position, targetView.position + cameraPos, Time.deltaTime * 5f);
+       // transform.position = Vector3.Lerp(transform.position, targetView.position + cameraOffset, Time.deltaTime * 5f);
 
         if (look.IsActive())
         {
