@@ -62,6 +62,8 @@ public class CCameraController : MonoBehaviour
         }
         else ControlDistance();
 
+       // transform.position = Vector3.Lerp(transform.position, targetView.position + cameraPos, Time.deltaTime * 5f);
+
         if (look.IsActive())
         {
             look.CorrectTargetPosition(targetView.position);
