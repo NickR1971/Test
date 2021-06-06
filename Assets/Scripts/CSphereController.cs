@@ -4,48 +4,45 @@ using UnityEngine;
 
 public class CSphereController : MonoBehaviour
 {
-    private Vector3[] m_dirList;
-    private CMove m_move;
+    private CMove move;
+    private const float minX = -13;
+    private const float maxX = 13;
+    private const float minY = 1;
+    private const float maxY = 7;
+    private const float minZ = -13;
+    private const float maxZ = 13;
 
     /////////////////
     // Start
     void Start()
     {
-        m_dirList = new Vector3[6];
-        m_dirList[0] = new Vector3(1, 0, 0);
-        m_dirList[1] = new Vector3(-1, 0, 0);
-        m_dirList[2] = new Vector3(0, 1, 0);
-        m_dirList[3] = new Vector3(0, -1, 0);
-        m_dirList[4] = new Vector3(0, 0, 1);
-        m_dirList[5] = new Vector3(0, 0, -1);
-
-        m_move = new CMove();
+        move = new CMove();
     }
 
-    private int CheckBounds()
+    private Vector3 SelectDirection()
     {
-        if (transform.position.x < -13) return 0;
-        if (transform.position.x > 13) return 1;
-        if (transform.position.y < 1) return 2;
-        if (transform.position.y > 7) return 3;
-        if (transform.position.z < -13) return 4;
-        if (transform.position.z > 13) return 5;
+        if (transform.position.x < minX) return Vector3.right;
+        if (transform.position.x > maxX) return Vector3.left;
+        if (transform.position.y < minY) return Vector3.up;
+        if (transform.position.y > maxY) return Vector3.down;
+        if (transform.position.z < minZ) return Vector3.forward;
+        if (transform.position.z > maxZ) return Vector3.back;
 
-        return -1;
+        Vector3 v = Random.insideUnitSphere;
+        v.Normalize();
+        return v;
     }
 
     /////////////////////////////////
     // Update
     void Update()
     {
-        if (!m_move.IsActive())
+        if (!move.IsActive())
         {
-            int n = CheckBounds();
-            if (n < 0) n = Random.Range(0, 6);
-            m_move.SetPositions(transform.position,transform.position+m_dirList[n]);
-            m_move.StartAction();
+            move.SetPositions(transform.position, transform.position + SelectDirection());
+            move.StartAction();
         }
-        m_move.UpdatePosition();
-        transform.position = m_move.GetCurrentPosition();
+        move.UpdatePosition();
+        transform.position = move.GetCurrentPosition();
     }
 }
